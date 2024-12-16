@@ -1,0 +1,18 @@
+
+set(LLVM_TARGET_DEFINITIONS DBOps.td)
+mlir_tablegen(DBOpsDialect.h.inc -gen-dialect-decls)
+mlir_tablegen(DBOpsDialect.cpp.inc -gen-dialect-defs)
+mlir_tablegen(DBOps.h.inc -gen-op-decls)
+mlir_tablegen(DBOps.cpp.inc -gen-op-defs)
+mlir_tablegen(DBOpsEnums.h.inc -gen-enum-decls)
+mlir_tablegen(DBOpsEnums.cpp.inc -gen-enum-defs)
+mlir_tablegen(DBOpsTypes.h.inc --gen-typedef-decls)
+mlir_tablegen(DBOpsTypes.cpp.inc --gen-typedef-defs)
+
+set(LLVM_TARGET_DEFINITIONS DBInterfaces.td)
+mlir_tablegen(DBOpsInterfaces.h.inc -gen-op-interface-decls)
+mlir_tablegen(DBOpsInterfaces.cpp.inc -gen-op-interface-defs)
+add_public_tablegen_target(MLIRDBOpsIncGen)
+add_dependencies(build_includes MLIRDBOpsIncGen)
+add_mlir_doc(DBOps DBDialect DB/ -gen-dialect-doc)
+add_mlir_doc(DBInterfaces DBInterfaces DB/ -gen-op-interface-docs)
