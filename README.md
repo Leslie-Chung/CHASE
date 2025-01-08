@@ -17,7 +17,7 @@ Ensure that the following dependencies are installed on your system:
 1. Clone the CHASE repository and navigate to the project directory:
 
    ```shell
-   cd chase
+   cd CHASE
    ```
 
 2. Set up a Python virtual environment and install required packages:
@@ -141,62 +141,41 @@ With these steps completed, CHASE should be properly installed and ready for use
 
 ### Create Docker
 
-#### pgvector
 
 ```shell
-# get pgvector
-git clone --branch v0.7.3 https://github.com/pgvector/pgvector.git
-cd pgvector
-cp chase/benchmark/prepare_env/pgvector/Dockerfile .
-cp -r chase/benchmark/prepare_env/scripts .
-cp benchmark/prepare_env/pgvector/hnswscan.c src/
-
-# build docker
-docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t pgvector -f Dockerfile .
-
-# run docker
-docker run --privileged --shm-size=100g --name=pgvector -e PGPASSWORD=pgvector -e PGUSERNAME=pgvector -e PGDATABASE=pgvector -v chase/benchmark/prepare_data:/laion pgvector 
-```
-
-
-
-#### vbase & pase
-
-```shell
-# get vbase
+# get vbase & pase
 git clone https://github.com/microsoft/MSVBASE.git
 cd MSVBASE
 git submodule update --init --recursive
 ./scripts/patch.sh
 
-cp chase/include/runtime/HNSW/space_ip.h thirdparty/hnsw/hnswlib
-cp chase/include/runtime/HNSW/space_l2.h thirdparty/hnsw/hnswlib
-cp chase/benchmark/prepare_env/vbase/hnswindex_builder.cpp src/
-cp chase/benchmark/prepare_env/vbase/hnswindex.cpp src/
-cp chase/benchmark/prepare_env/vbase/pase_hnswindex.cpp src/
+cp ../CHASE/include/runtime/HNSW/space_ip.h thirdparty/hnsw/hnswlib
+cp ../CHASE/include/runtime/HNSW/space_l2.h thirdparty/hnsw/hnswlib
+cp ../CHASE/benchmark/prepare_env/vbase/hnswindex_builder.cpp src/
+cp ../CHASE/benchmark/prepare_env/vbase/hnswindex.cpp src/
+cp ../CHASE/benchmark/prepare_env/vbase/pase_hnswindex.cpp src/
+cp ../CHASE/benchmark/prepare_env/vbase/Dockerfile .
+cp -r ../CHASE/benchmark/prepare_env/scripts .
 
-cp chase/benchmark/prepare_env/vbase/Dockerfile .
-cp -r chase/benchmark/prepare_env/scripts .
+# get pgvector
+git clone --branch v0.7.3 https://github.com/pgvector/pgvector.git
+cd pgvector
+cp ../../CHASE/benchmark/prepare_env/pgvector/Makefile .
+cp ../../CHASE/benchmark/prepare_env/pgvector/hnswscan.c src/
 
 # build docker
-docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t vbase -f Dockerfile .
-docker run --privileged --shm-size=100g --name=vbase -e PGPASSWORD=vectordb -e PGUSERNAME=vectordb -e PGDATABASE=vectordb -v chase/benchmark/prepare_data:/laion vbase 
+docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) -t hqdb -f Dockerfile .
+docker run --privileged --shm-size=100g --name=hqdb -e PGPASSWORD=hqdb -e PGUSERNAME=hqdb -e PGDATABASE=hqdb -v /CHASE/benchmark/prepare_data/data:/laion hqdb 
+
+# chase & lingodb
+docker cp CHASE hqdb:/home/postgres
 ```
-
-
-
-#### chase & lingodb
-
-```shell
-docker cp chase vbase:/home/postgres
-```
-
 
 
 ### Generate Data
 
 ```shell
-cd chase
+cd CHASE
 ./benchmark/prepare_data/generate_data.sh
 ```
 
@@ -204,52 +183,20 @@ cd chase
 
 ### Create Table & index
 
-#### pgvector
 
 ```shell
-docker cp chase/benchmark/prepare_env/pgvector/create_table.sql vbase:/
-docker exec -it pgvector bash
-psql -U vectordb -h localhost -d laion_pgvector -f /create_table.sql
+docker cp benchmark/prepare_env/pgvector/create_table.sql hqdb:/tmp/vectordb/pgvector
+docker cp benchmark/prepare_env/vbase/create_table.sql hqdb:/tmp/vectordb
+docker exec -it hqdb 
+psql -U postgres -h localhost -d vectordb -f /tmp/vectordb/pgvector/create_table.sql
+psql -U postgres -h localhost -d vectordb -f /tmp/vectordb/create_table.sql
 ```
-
-
-
-#### vbase & pase
-
-```shell
-docker exec -it vbase bash
-psql -U vectordb -h localhost -d laion_vbase -f chase/benchmark/prepare_env/vbase/create_table.sql
-```
-
-
-
-#### chase & lingodb
-
-```shell
-docker exec -it vbase bash
-cd chase
-echo "CREATE TABLE laion1m (
-   sample_id int8 PRIMARY KEY,
-   url text,
-   text text,
-   height int4,
-   width int4,
-   nsfw text,
-   similarity float8,
-   vec vector(512) NOT NULL
-);" > init.sql
-
-build/chase-debug/run-sql init.sql resources/data/laion
-cp resources/data/laion/laion1m.metadata.json resources/data/laion/laion100.metadata.json
-```
-
-
 
 ### run benchmark
 
 ```shell
-docker exec -it vbase bash
-cd chase
+docker exec -it hqdb bash
+cd CHASE
 ./bench.sh
 ```
 

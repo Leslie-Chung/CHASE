@@ -5,8 +5,8 @@ import pyarrow as pa
 import numpy as np
 import pyarrow.feather as pf
 
-
-base_path = './'
+# %%
+base_path = 'benchmark/prepare_data/data'
 
 # read metadata
 meta_path = os.path.join(base_path, 'part-00000-5b54c5d5-bbcf-484d-a2ce-0d6f73df1a36-c000.snappy.parquet')
@@ -24,6 +24,8 @@ print(meta)
 
 arrays = []
 for i in range(11):
+   if i == 8:
+      continue
    data = np.load(os.path.join(base_path, f'img_emb_{i}.npy'))
    arrays.append(data)
 vectors = np.concatenate(arrays, axis=0)
@@ -40,10 +42,10 @@ length2 = 1000448 * 3
 new_meta = pa.concat_tables([meta.slice(offset1, length1),meta.slice(offset2, length2)])
 for i in range(len(cols_name) - 1):
    result.append(new_meta[cols_name[i]])
-result.append(pa.array(vectors, type=pa.list_(pa.float32(), dimension))) 
+result.append(pa.array(vectors.tolist(), type=pa.list_(pa.float32(), dimension))) 
 cols_name_lower = [col.lower() for col in cols_name]
 table = pa.table(result, names=cols_name_lower)
-print(table)
+# print(table)
 
 # Ensure that the sample_id column is unique
 sample_id_column = table.column('sample_id')
@@ -61,15 +63,22 @@ mask = ~mask
 unique_table = unique_table.filter(mask)
 
 # %%
-pf.write_feather(unique_table, 'chase/resources/data/laion/laion10m.arrow', 'uncompressed')  
+folder_name = 'resources/data/laion/'
+if not os.path.exists(folder_name):
+   os.makedirs(folder_name) 
+pf.write_feather(unique_table, 'resources/data/laion/laion10m.arrow', 'uncompressed')  
 M = 1000000
-pf.write_feather(unique_table.slice(0, M), 'chase/resources/data/laion/laion1m.arrow', 'uncompressed')
-pf.write_feather(unique_table.slice(M, 100), 'chase/resources/data/laion/laion100.arrow', 'uncompressed') 
+laion1m = unique_table.slice(0, M)
+pf.write_feather(laion1m, 'resources/data/laion/laion1m.arrow', 'uncompressed')
+pf.write_feather(unique_table.slice(M, 100), 'resources/data/laion/laion100.arrow', 'uncompressed') 
 
 # %%
 import hnswlib
-ids = np.arange(len(vectors))
-p = hnswlib.Index(space = 'ip', dim = dimension) # possible options are l2, cosine or ip
-p.init_index(max_elements = num_rows, ef_construction = 200, M = 16)
-p.add_items(vectors, ids, num_threads = 32)
-p.save_index("chase/resources/data/laion/laion1m.vec.hnsw")
+# laion1m = pf.read_table("resources/data/laion/laion1m.arrow")
+vectors = laion1m['vec'].to_pylist()
+max_num = len(vectors)
+ids = np.arange(max_num)
+p = hnswlib.Index(space = 'ip', dim = 512) # possible options are l2, cosine or ip
+p.init_index(max_elements = max_num, ef_construction = 200, M = 16)
+p.add_items(vectors, ids, num_threads = 48)
+p.save_index("resources/data/laion/laion1m.vec.hnsw")

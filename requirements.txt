@@ -1,4 +1,4 @@
--f https://www.lingo-db.com/dev-dependencies/
+-f lingodb_llvm-0.0.0.dev0-py3-none-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
 lingodb-llvm==0.0.0.dev0
 pyarrow==14.0.0
 numpy==1.26.2

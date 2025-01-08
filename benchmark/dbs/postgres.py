@@ -14,25 +14,25 @@ class PostgresLike(Base):
       dbs = {
          'vbase' : {
             'db': 'laion_vbase',
-            'host': '172.17.0.2',
-            'usr': 'vectordb',
+            # 'host': '172.17.0.2',
+            # 'usr': 'hqdb',
          }, 
          'pgvector' : {
             'db': 'laion_pgvector',
-            'host': '172.17.0.3',
-            'usr': 'pgvector',
+            # 'host': '172.17.0.2',
+            # 'usr': 'hqdb',
          }, 
          'pase' : {
             'db': 'laion_pase',
-            'host': '172.17.0.2',
-            'usr': 'vectordb',
+            # 'host': '172.17.0.2',
+            # 'usr': 'hqdb',
          }, 
       }
 
       db = dbs[user_dbname]['db']
-      usr = dbs[user_dbname]['usr']
-      host = dbs[user_dbname]['host']
-      self.conn = psycopg2.connect(database=db, user=usr, password=usr, host=host)
+      # usr = dbs[user_dbname]['usr']
+      # host = dbs[user_dbname]['host']
+      self.conn = psycopg2.connect(database=db, user='hqdb', password='hqdb', host='localhost')
       
       self.explain = explain
       self.use_index = use_index

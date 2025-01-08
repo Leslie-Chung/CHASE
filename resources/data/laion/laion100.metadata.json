@@ -1,0 +1,91 @@
+{
+  "columns": [
+    {
+      "name": "sample_id",
+      "type": {
+        "base": "int",
+        "nullable": false,
+        "props": [
+          64
+        ]
+      }
+    },
+    {
+      "name": "url",
+      "type": {
+        "base": "string",
+        "nullable": true,
+        "props": []
+      }
+    },
+    {
+      "name": "text",
+      "type": {
+        "base": "string",
+        "nullable": true,
+        "props": []
+      }
+    },
+    {
+      "name": "height",
+      "type": {
+        "base": "int",
+        "nullable": true,
+        "props": [
+          32
+        ]
+      }
+    },
+    {
+      "name": "width",
+      "type": {
+        "base": "int",
+        "nullable": true,
+        "props": [
+          32
+        ]
+      }
+    },
+    {
+      "name": "nsfw",
+      "type": {
+        "base": "string",
+        "nullable": true,
+        "props": []
+      }
+    },
+    {
+      "name": "similarity",
+      "type": {
+        "base": "float",
+        "nullable": true,
+        "props": [
+          64
+        ]
+      }
+    },
+    {
+      "name": "vec",
+      "type": {
+        "base": "vector",
+        "nullable": false,
+        "props": [
+          512
+        ]
+      }
+    }
+  ],
+  "num_rows": 0,
+  "indices": [
+    {
+      "columns": [
+        "sample_id"
+      ],
+      "name": "pk_hash",
+      "type": 0
+    }
+  ],
+  "pkey": [
+    "sample_id"
+  ]
+}

@@ -1,11 +1,11 @@
 #pragma once
 #include "hnswlib.h"
-static int cal_times = 0;
+// static int cal_times = 0;
 namespace hnswlib {
 
     static float
     InnerProduct(const void *pVect1, const void *pVect2, const void *qty_ptr) {
-        cal_times++;
+        // cal_times++;
         size_t qty = *((size_t *) qty_ptr);
         float res = 0;
         for (unsigned i = 0; i < qty; i++) {
@@ -375,7 +375,7 @@ namespace hnswlib {
         }
 
     ~InnerProductSpace() {
-        std::cout << "ip times in index = " << cal_times << std::endl;
+        // std::cout << "ip times in index = " << cal_times << std::endl;
     }
     };
 

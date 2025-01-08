@@ -27,11 +27,11 @@ for target in targets:
 
    df['text'].replace('\t', ' ', inplace=True, regex=True)
    df['url'].replace('\t', ' ', inplace=True, regex=True)
-   df.to_csv(f'benchmark/prepare_data/{target}_pgvector.tsv', sep='\t', index=False)
+   df.to_csv(f'benchmark/prepare_data/data/{target}_pgvector.tsv', sep='\t', index=False)
 
    import subprocess
-   command = ["sed", "-e", "s/\\[/\\{/g", "-e", "s/\\]/\\}/g", f"data/{target}_pgvector.tsv"]
-   with open(f"benchmark/prepare_data/{target}_vbase.tsv", "w") as output_file:
+   command = ["sed", "-e", "s/\\[/\\{/g", "-e", "s/\\]/\\}/g", f"benchmark/prepare_data/data/{target}_pgvector.tsv"]
+   with open(f"benchmark/prepare_data/data/{target}_vbase.tsv", "w") as output_file:
       subprocess.run(command, stdout=output_file)
 
 

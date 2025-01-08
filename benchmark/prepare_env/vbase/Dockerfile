@@ -87,6 +87,10 @@ RUN echo 'postgres ALL=(ALL) ALL' >> /etc/sudoers
 COPY ./thirdparty/Postgres /home/postgres/src/
 RUN echo "this line could be executed for a very long time" && chown -R postgres:postgres /home/postgres/src 
     
+# RUN apt install sed && \
+# sed -i 's/#include <compile.h>/\/\/#include <compile.h>/' /home/postgres/src/src/pl/plpython/plpython.h && \
+# sed -i 's/#include <eval.h>/\/\/#include <eval.h>/' /home/postgres/src/src/pl/plpython/plpython.h
+
 RUN cd /home/postgres/src \
     && su postgres -c "./configure \
     --with-blocksize=32 \
@@ -127,6 +131,11 @@ RUN cd /tmp/vectordb && \
     cmake -DCMAKE_INSTALL_PREFIX=/usr/local/vectordb -DLIBRARYONLY=ON -DSEEK_ENABLE_TESTS=ON -DCMAKE_BUILD_TYPE=Release .. && \
 	make -j$(nproc) && \
 	make install
+
+RUN cd /tmp/vectordb/pgvector && \
+    make clean && \
+    make OPTFLAGS="" && \
+    make install &&
 
 ENV PATH="${PATH}:/usr/local/lib"
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
