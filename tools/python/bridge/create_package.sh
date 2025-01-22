@@ -43,7 +43,7 @@ cp ../chase-release/tools/python/bridge/libpybridge.so  lingodbbridge/libs/.
 ../../tmpvenv/bin/pip install pandas
 CC="clang-16" ../../tmpvenv/bin/python3 setup.py install
 
-cd tools/python
+cd ../../tools/python
 ../../tmpvenv/bin/python3 setup.py install
 
 # python3 -m build --wheel
