@@ -41,6 +41,7 @@ mkdir -p lingodbbridge/libs
 cp ../chase-release/tools/python/bridge/libpybridge.so  lingodbbridge/libs/.
 ../../tmpvenv/bin/pip install pybind11
 ../../tmpvenv/bin/pip install pandas
+../../tmpvenv/bin/pip install psycopg2
 CC="clang-16" ../../tmpvenv/bin/python3 setup.py install
 
 cd ../../tools/python
