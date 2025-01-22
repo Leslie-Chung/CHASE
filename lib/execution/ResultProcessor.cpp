@@ -16,7 +16,8 @@
 #include <string>
 #include <vector>
 #include <arrow/io/api.h>
-
+#include <arrow/csv/api.h>
+#include <arrow/csv/writer.h>
 
 // #include <arrow/ipc/api.h>
 
@@ -72,16 +73,10 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
    }
    auto now = std::chrono::system_clock::now();
    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-   // std::stringstream ss;
-   // ss << "/home/mr/lingo-db/results/" << now_ms << ".arrow";
-   // std::string file(ss.str());
 
-   // auto inputFile = arrow::io::FileOutputStream::Open(file).ValueOrDie();
-   // auto batchWriter = arrow::ipc::MakeFileWriter(inputFile, table->schema()).ValueOrDie();
-   // if (!batchWriter->WriteTable(*table).ok() || !batchWriter->Close().ok() || !inputFile->Close().ok()) {
-   //    std::cerr << "could not store table" << std::endl;
-   //    exit(1);
-   // }
+   // auto outputFile = arrow::io::FileOutputStream::Open("test.csv").ValueOrDie();
+   // arrow::csv::WriteCSV(*table, arrow::csv::WriteOptions::Defaults(), outputFile.get());
+
    std::vector<std::string> columnReps;
    std::vector<size_t> positions;
    arrow::PrettyPrintOptions options;
